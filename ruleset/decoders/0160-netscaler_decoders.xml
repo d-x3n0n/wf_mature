@@ -1,0 +1,95 @@
+
+<decoder name="netscaler">
+    <prematch>\d\d/\d\d/\d\d\d\d:\s*\d\d:\d\d:\d\d\s+GMT\s+\S+\.+PPE\.+:\s|\d\d/\d\d/\d\d\d\d:\s*\d\d:\d\d:\d\d\s+GMT\s+ns\.+:\s</prematch>
+</decoder>
+
+<decoder name="netscaler-AAA">
+    <parent>netscaler</parent>
+    <prematch> AAA LOGIN_FAILED</prematch>
+    <regex offset="after_parent">(AAA) LOGIN_FAILED \.+User (\S+) - Client_ip (\S+) - Failure_reason ("\.+")</regex>
+    <order>id,srcuser,srcip,status</order>
+</decoder>
+
+<decoder name="netscaler-UI">
+    <parent>netscaler</parent>
+    <prematch> UI CMD_EXECUTED| API CMD_EXECUTED</prematch>
+    <regex offset="after_parent">(\S+) CMD_EXECUTED \.+User (\S+) - Remote_ip (\S+) - Command "(\.+)" - Status "(\.+)"</regex>
+    <order>id,srcuser,srcip,action,status</order>
+</decoder>
+
+<decoder name="netscaler-SSLVPN-LOGIN">
+    <parent>netscaler</parent>
+    <prematch> SSLVPN LOGIN</prematch>
+    <regex offset="after_parent">(SSLVPN) LOGIN \.+ User (\S+) - Client_ip (\S+) - Nat_ip "\.+" - Vserver (\S+) - Browser_type "\.+" - SSLVPN_client_type \.+ - Group</regex>
+    <order>id,srcuser,srcip,dstip</order>
+</decoder>
+
+<decoder name="netscaler-SSLVPN-LOGOUT">
+    <parent>netscaler</parent>
+    <prematch> SSLVPN LOGOUT</prematch>
+    <regex offset="after_parent">(SSLVPN) LOGOUT \.+User (\S+) - Client_ip (\S+) - Nat_ip "\.+" - Vserver (\S+) - Start_time "\.+" - End_time "\.+" - Duration (\S+)</regex>
+    <order>id,srcuser,srcip,dstip</order>
+</decoder>
+
+<decoder name="netscaler-SSLVPN-ICASTART">
+    <parent>netscaler</parent>
+    <prematch> SSLVPN ICASTART</prematch>
+    <regex offset="after_parent">(SSLVPN) ICASTART \.+Source (\S+) - Destination (\S+) - username:domainname (\S+) - applicationName (\S+) </regex>
+    <order>id,srcip,dstip,srcuser,extra_data</order>
+</decoder>
+
+<decoder name="netscaler-SSLVPN-ICAEND_CONNSTAT">
+    <parent>netscaler</parent>
+    <prematch> SSLVPN ICAEND_CONNSTAT</prematch>
+    <regex offset="after_parent">(SSLVPN) ICAEND_CONNSTAT \.+Source (\S+) - Destination (\S+) - username:domainname (\S+) -</regex>
+    <order>id,srcip,dstip,srcuser</order>
+</decoder>
+
+<decoder name="netscaler-SSLVPN-NONHTTP_RESOURCEACCESS_DENIED">
+    <parent>netscaler</parent>
+    <prematch> SSLVPN NONHTTP_RESOURCEACCESS_DENIED</prematch>
+    <regex offset="after_parent">(SSLVPN) NONHTTP_RESOURCEACCESS_DENIED\.+User (\S+) - Client_ip (\S+) - Nat_ip \S+ - Vserver (\S+) - Source (\S+) - Destination (\S+) -\.+Denied_by_policy "(\.+)" - Group</regex>
+    <order>id,srcuser,srcip,dstip,srcport,dstport,extra_data</order>
+</decoder>
+
+<decoder name="netscaler-SSLVPN-HTTP_RESOURCEACCESS_DENIED">
+    <parent>netscaler</parent>
+    <prematch> SSLVPN HTTP_RESOURCEACCESS_DENIED</prematch>
+    <regex offset="after_parent">(SSLVPN) HTTP_RESOURCEACCESS_DENIED\.+User (\S+) - \.+ - Remote_host (\S+) - Denied_url (\S+ \S+) - Denied_by_policy "(\.+)" - Group</regex>
+    <order>id,srcuser,dstip,url,extra_data</order>
+</decoder>
+
+<decoder name="netscaler-SSLVPN-CLISEC_CHECK">
+    <parent>netscaler</parent>
+    <prematch> SSLVPN CLISEC_CHECK</prematch>
+    <regex offset="after_parent">(SSLVPN) CLISEC_CHECK\.+User (\S+) - Client_ip (\S+) - Vserver (\S+) - Client_security_expression "(\.+)" -</regex>
+    <order>id,srcuser,srcip,dstip,extra_data</order>
+</decoder>
+
+<decoder name="netscaler-ACL">
+    <parent>netscaler</parent>
+    <prematch> ACL ACL_PKT_LOG</prematch>
+    <regex offset="after_parent">(ACL) ACL_PKT_LOG\.+Source (\S+) --\.+Destination (\S+) - Protocol (\S+) - \.+Hit Rule (\.+) - Data</regex>
+    <order>id,srcip,dstip,protocol,extra_data</order>
+</decoder>
+
+<decoder name="netscaler-AAATM-LOGIN">
+    <parent>netscaler</parent>
+    <prematch> AAATM LOGIN</prematch>
+    <regex offset="after_parent">(AAATM) LOGIN\.+User (\S+) - Client_ip (\S+) - Nat_ip "\.+" - Vserver (\S+)</regex>
+    <order>id,srcuser,srcip,dstip</order>
+</decoder>
+
+<decoder name="netscaler-AAATM-LOGOUT">
+    <parent>netscaler</parent>
+    <prematch> AAATM LOGOUT</prematch>
+    <regex offset="after_parent">(AAATM) LOGOUT \.+User (\S+) - Client_ip (\S+) - Nat_ip "\.+" - Vserver (\S+) - Start_time "\.+" - End_time "\.+" - Duration (\S+)</regex>
+    <order>id,srcuser,srcip,dstip</order>
+</decoder>
+
+<decoder name="netscaler-generic">
+    <parent>netscaler</parent>
+    <prematch offset="after_parent">^AAA|^UI|^SSLVPN|^EVENT|^SSLLOG|^APPFW|^TCP|^ROUTING|^SNMP|^ACL|^TRANSFORM|^APPFW_RESP|^AAATM|^PITBOSS|^CVPN</prematch>
+    <regex offset="after_parent">(\S+)</regex>
+    <order>id</order>
+</decoder>

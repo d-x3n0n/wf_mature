@@ -1,0 +1,16 @@
+
+<decoder name="ar_log">
+  <prematch>^\w\w\w \w+\s+\d+ \d\d:\d\d:\d\d \p*\w+ \d+ /\S+/active-response/bin/|^\w\w\w \d\d/\d\d/\d\d\d\d \.+"active-response/bin/|^\d\d/\d\d/\d\d\d\d \.+"active-response/bin/</prematch>
+</decoder>
+
+<decoder name="ar_log_fields">
+    <parent>ar_log</parent>
+    <regex offset="after_parent">^(\S+) (\S+) - (\S+) (\.+) |^(\S+)" (\S+) "-" "(\S+)" "(\.+) </regex>
+    <order>script, type, srcip, id</order>
+</decoder>
+
+<decoder name="ar_log_fields">
+    <parent>ar_log</parent>
+    <regex offset="after_regex">^(\d+)|(\.+\))</regex>
+    <order>extra_data</order>
+</decoder>

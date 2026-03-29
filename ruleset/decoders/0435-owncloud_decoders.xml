@@ -1,0 +1,36 @@
+
+<decoder name="owncloud">
+  <prematch>^{"reqId":"\S+","message":"\.+","level":\d,"time":"\S+"}$|^{"app":"\S+","message":"\.+","level":\d,"time":"\S+"}$|^{"reqId":"\S+","level":\d,"time":"\S+","message":"\.+"}$</prematch>
+</decoder>
+
+<decoder name="owncloud">
+  <program_name>^ownCloud</program_name>
+</decoder>
+
+<decoder name="owncloud-failed1">
+  <parent>owncloud</parent>
+  <prematch>Login failed: user </prematch>
+  <regex offset="after_prematch">^'(\w+)' , wrong password, IP:(\d+.\d+.\d+.\d+)</regex>
+  <order>user, srcip</order>
+</decoder>
+
+<decoder name="owncloud-failed2">
+  <parent>owncloud</parent>
+  <prematch>Login failed: </prematch>
+  <regex offset="after_prematch">^'(\w+)' \(Remote IP: '(\d+.\d+.\d+.\d+)</regex>
+  <order>user, srcip</order>
+</decoder>
+
+<decoder name="owncloud-malicious">
+  <parent>owncloud</parent>
+  <prematch>Passed filename is not valid, might be malicious </prematch>
+  <regex offset="after_prematch">;ip:"(\d+.\d+.\d+.\d+)|;ip:\\"(\d+.\d+.\d+.\d+)</regex>
+  <order>srcip</order>
+</decoder>
+
+<decoder name="owncloud-loglevel">
+  <parent>owncloud</parent>
+  <prematch>","level":</prematch>
+  <regex offset="after_prematch">^(\d),"</regex>
+  <order>status</order>
+</decoder>
